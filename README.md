@@ -9,7 +9,7 @@ php simple mvc framework
                 listen       80;
                 server_name codejm;
                 index index.html index.htm index.php;
-                root  /home/codejm/winy/htdocs/codejm/codejm;
+                root  /dir/codejm;
 
                 location / {
                     try_files $uri $uri/ /index.php?$args;
