@@ -30,6 +30,12 @@ class Route {
                 return true;
             }
         }
+        if(strtolower($class) == 'controller' || strtolower($class) == 'models'){
+            if(file_exists($file = CORE_PATH.$class.'.php')) {
+                require $file;
+                return true;
+            }
+        }
         if(strpos($class, 'Controller') !== FALSE) {
             $temp_dir = dirname($this->dir);
             if(file_exists($file = $temp_dir.'/controllers/'.$class.'.php')) {
@@ -53,80 +59,80 @@ class Route {
                     return true;
                 }
             }
-        } else if(file_exists($file = CORE_PATH.$class.".php")) {
+        } else if(file_exists($file = HELPERS_PATH.$class.".php")) {
             require $file;
             return true;
         }
+}
+
+/**
+ * URL 路由解析 core
+ *
+ */
+public function parseURL() {
+    // module controller action
+    // get
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+    // split URL
+    $path = trim($path, '/');
+    if(empty($path))
+        $path = array();
+    else {
+        $path = explode('/', $path);
+        if(CHILDDIR) {
+            $path = array_slice($path, CHILDDIR);
+        }
     }
 
-    /**
-     * URL 路由解析 core
-     *
-     */
-    public function parseURL() {
-        // module controller action
-        // get
-        $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-        // split URL
-        $path = trim($path, '/');
-        if(empty($path))
-            $path = array();
-        else {
-            $path = explode('/', $path);
-            if(CHILDDIR) {
-                $path = array_slice($path, CHILDDIR);
-            }
-        }
-
-        // default
-        $dir = false;
-        if(isset($path[0])) {
-            if(is_dir(WEB_ROOT.$path[0])) {
-                $dir = true;
-                if(!isset($path[1])) $path[1] = DEFAULT_CONTROLLER;
-                $this->controller = $path[0].'_'.$path[1].'Controller';
-                $path = array_slice($path, 1);
-            } else {
-                $this->controller = $path[0].'Controller';
-            }
-            if(!isset($path[1])) $path[1] = DEFAULT_ACTION;
-            $this->action = $path[1];
-            $params = array_slice($path, 2);
-
-            // 参数处理
-            $params_len = count($params);
-            for($i=0; $i<$params_len; $i=$i+2){
-                if(isset($params[$i+1])){
-                    $_GET[$params[$i]] = $params[$i+1];
-                    $_REQUEST[$params[$i]] = $params[$i+1];
-                }
-            }
+    // default
+    $dir = false;
+    if(isset($path[0])) {
+        if(is_dir(WEB_ROOT.$path[0])) {
+            $dir = true;
+            if(!isset($path[1])) $path[1] = DEFAULT_CONTROLLER;
+            $this->controller = $path[0].'_'.$path[1].'Controller';
+            $path = array_slice($path, 1);
         } else {
-            $this->controller = DEFAULT_CONTROLLER.'Controller';
-            $this->action = DEFAULT_ACTION;
+            $this->controller = $path[0].'Controller';
         }
+        if(!isset($path[1])) $path[1] = DEFAULT_ACTION;
+        $this->action = $path[1];
+        $params = array_slice($path, 2);
 
-        // 子目录处理
-        if($dir) {
-            $this->file = str_replace('_', '/controllers/', $this->controller);
-            $this->file = WEB_ROOT.dirname($this->file).'/'.$this->controller.'.php';
-        } else {
-            $this->file = APP_PATH.'controllers/'.$this->controller.'.php';
-        }
-        $this->dir = dirname(dirname($this->file)).'/components/';
-
-        // 实例化Controller
-        if(file_exists($this->file)) {
-            $object = new $this->controller();
-            // 调用Action
-            if (method_exists($object, $this->action)) {
-                $object->{$this->action}();
-                exit;
+        // 参数处理
+        $params_len = count($params);
+        for($i=0; $i<$params_len; $i=$i+2){
+            if(isset($params[$i+1])){
+                $_GET[$params[$i]] = $params[$i+1];
+                $_REQUEST[$params[$i]] = $params[$i+1];
             }
         }
-        header("HTTP/1.1 404 Not Found");
-        header("Status: 404 Not Found");
+    } else {
+        $this->controller = DEFAULT_CONTROLLER.'Controller';
+        $this->action = DEFAULT_ACTION;
+    }
+
+    // 子目录处理
+    if($dir) {
+        $this->file = str_replace('_', '/controllers/', $this->controller);
+        $this->file = WEB_ROOT.dirname($this->file).'/'.$this->controller.'.php';
+    } else {
+        $this->file = APP_PATH.'controllers/'.$this->controller.'.php';
+    }
+    $this->dir = dirname(dirname($this->file)).'/components/';
+
+    // 实例化Controller
+    if(file_exists($this->file)) {
+        $object = new $this->controller();
+        // 调用Action
+        if (method_exists($object, $this->action)) {
+            $object->{$this->action}();
+            exit;
+        }
+    }
+    header("HTTP/1.1 404 Not Found");
+    header("Status: 404 Not Found");
         exit;
     }
 

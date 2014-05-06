@@ -7,7 +7,7 @@
  *      $Id: Models.php 2014-04-08 14:58:54 codejm $
  */
 
-class BaseModels {
+class Models {
 
     /**
      * 数据初始化

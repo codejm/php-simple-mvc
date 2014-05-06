@@ -68,6 +68,7 @@ define('PATH_VIEW_FILE_TYPE', '.html');
 
 // DIR
 define('CORE_PATH', WEB_ROOT . 'application/core/');
+define('HELPERS_PATH', WEB_ROOT . 'application/helpers/');
 define('APP_PATH', WEB_ROOT . 'application/');
 define('UPLOAD_DIR', WEB_ROOT . 'data/');
 define('DEFAULT_CONTROLLER', 'site');

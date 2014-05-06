@@ -4,10 +4,10 @@
  *      [CodeJm!] Author CodeJm[codejm@163.com].
  *
  *      Controller 父类
- *      $Id: baseController.php 2014-05-06 10:59:47 codejm $
+ *      $Id: Controller.php 2014-05-06 10:59:47 codejm $
  */
 
-class BaseController {
+class Controller {
     //
     public $db = null;
     public $cache = null;

@@ -7,7 +7,7 @@
  *      $Id: siteController.php 2014-04-08 14:26:17 codejm $
  */
 
-class SiteController extends BaseController {
+class SiteController extends Controller {
 
     public function index() {
         $this->render('site/index', array('name'=>'codejm'));
